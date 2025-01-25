@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">GoldenCargoApp</string>
+    <string-array name="menu_options">
+        <item>Home</item>
+        <item>Logistics</item>
+        <item>Drivers</item>
+        <item>Vehicles</item>
+        <item>Clients &amp; Orders</item>
+        <item>Invoices &amp; Documents</item>
+    </string-array>
+</resources>
