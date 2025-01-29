@@ -1,28 +1,29 @@
 <menu xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/menu_transport_orders"
+        android:icon="@drawable/ic_transport_orders"
+        android:title="Transport"
+        tools:ignore="HardcodedText" />
+    <item
         android:id="@+id/menu_logistics"
         android:icon="@drawable/ic_logistics"
-        android:title="Logistics"
+        android:title="Incidents"
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/menu_routes"
         android:icon="@drawable/ic_routes"
-        android:title="Routes"
+        android:title="Damages"
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/menu_locations"
-        android:icon="@drawable/ic_menu"
-        android:title="Locations"
+        android:icon="@drawable/ic_locations"
+        android:title="Reports"
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/menu_transports"
         android:icon="@drawable/ic_transports"
-        android:title="Transports"
+        android:title="Breakdowns"
         tools:ignore="HardcodedText" />
-    <item
-        android:id="@+id/menu_transport_orders"
-        android:icon="@drawable/ic_transport_orders"
-        android:title="Transport Orders"
-        tools:ignore="HardcodedText" />
+
 </menu>

@@ -11,17 +11,15 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TransportOrderService {
 
     private static final String API_URL = "http://10.0.2.2:8080/api";
     private static final String TRANSPORT_ORDERS = "/transport-orders/all";
+    private static final String TRANSPORT_ORDERS_TODO = "/transport-orders/todo";
     private static final String TAG = "TransportOrderService";
     private static final String PREF_NAME = "AuthPreferences";
     private static final String JWT_KEY = "jwt_token";
@@ -52,7 +50,6 @@ public class TransportOrderService {
                 if (token != null) {
                     headers.put("Authorization", "Bearer " + token);
                 }
-
                 return headers;
             }
         };
@@ -60,21 +57,28 @@ public class TransportOrderService {
         queue.add(jsonArrayRequest);
     }
 
-    public List<Map<String, String>> parseTransportOrders(JSONArray jsonArray) throws Exception {
-        List<Map<String, String>> dataList = new ArrayList<>();
+    public void fetchTransportOrdersToDo(Response.Listener<JSONArray> onSuccess, Response.ErrorListener onError) {
+        Log.d(TAG, "Sending request to API: " + API_URL + TRANSPORT_ORDERS_TODO);
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject obj = jsonArray.getJSONObject(i);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+                Request.Method.GET,
+                API_URL + TRANSPORT_ORDERS_TODO,
+                null,
+                onSuccess,
+                onError
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                String token = sharedPreferences.getString(JWT_KEY, null);
+                if (token != null) {
+                    headers.put("Authorization", "Bearer " + token);
+                }
+                return headers;
+            }
+        };
 
-            Map<String, String> dataMap = new HashMap<>();
-            dataMap.put("transportOrderId", "ID: " + obj.getString("transportOrderId"));
-            dataMap.put("name", "Name: " + obj.getString("name"));
-            dataMap.put("driverName", "Driver: " + obj.getString("driverName"));
-            dataMap.put("status", "Status: " + obj.getString("status"));
-
-            dataList.add(dataMap);
-        }
-
-        return dataList;
+        queue.add(jsonArrayRequest);
     }
 }

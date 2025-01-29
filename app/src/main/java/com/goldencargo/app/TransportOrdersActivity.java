@@ -2,26 +2,26 @@ package com.goldencargo.app;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.goldencargo.app.adapters.TransportOrderAdapter;
 import com.goldencargo.app.service.TransportOrderService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TransportOrdersActivity extends AppCompatActivity {
 
     private static final String TAG = "TransportOrdersActivity";
-    private ListView listView;
+    private RecyclerView recyclerCompleted, recyclerNew, recyclerPending;
+    private TransportOrderAdapter adapterCompleted, adapterNew, adapterPending;
     private TransportOrderService transportOrderService;
 
     @Override
@@ -29,8 +29,23 @@ public class TransportOrdersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transport_orders);
 
-        listView = findViewById(R.id.list_view_driver_reports);
         transportOrderService = new TransportOrderService(this);
+
+        recyclerCompleted = findViewById(R.id.recycler_completed);
+        recyclerNew = findViewById(R.id.recycler_new);
+        recyclerPending = findViewById(R.id.recycler_pending);
+
+        recyclerCompleted.setLayoutManager(new LinearLayoutManager(this));
+        recyclerNew.setLayoutManager(new LinearLayoutManager(this));
+        recyclerPending.setLayoutManager(new LinearLayoutManager(this));
+
+        adapterCompleted = new TransportOrderAdapter(new ArrayList<>());
+        adapterNew = new TransportOrderAdapter(new ArrayList<>());
+        adapterPending = new TransportOrderAdapter(new ArrayList<>());
+
+        recyclerCompleted.setAdapter(adapterCompleted);
+        recyclerNew.setAdapter(adapterNew);
+        recyclerPending.setAdapter(adapterPending);
 
         fetchTransportOrders();
     }
@@ -51,35 +66,34 @@ public class TransportOrdersActivity extends AppCompatActivity {
     }
 
     private void displayTransportOrders(JSONArray jsonArray) {
-        List<Map<String, String>> dataList = new ArrayList<>();
+        List<JSONObject> completedList = new ArrayList<>();
+        List<JSONObject> newList = new ArrayList<>();
+        List<JSONObject> pendingList = new ArrayList<>();
 
         try {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
+                String status = obj.getString("status");
 
-                Map<String, String> dataMap = new HashMap<>();
-                dataMap.put("name", obj.getString("name"));
-                dataMap.put("driver", "Driver: " + obj.getString("driverName") + " (" + obj.getString("driverLicenseNumber") + ")");
-                dataMap.put("vehicle", "Vehicle: " + obj.getString("vehicleDetails"));
-                dataMap.put("route", "Route: " + obj.getString("startLocation") + " -> " + obj.getString("endLocation"));
-                dataMap.put("status", "Status: " + obj.getString("status"));
-
-                dataList.add(dataMap);
+                switch (status) {
+                    case "COMPLETED":
+                        completedList.add(obj);
+                        break;
+                    case "NEW":
+                        newList.add(obj);
+                        break;
+                    case "PENDING":
+                        pendingList.add(obj);
+                        break;
+                }
             }
+
+            adapterCompleted.updateData(completedList);
+            adapterNew.updateData(newList);
+            adapterPending.updateData(pendingList);
+
         } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error parsing data", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Error parsing transport orders", e);
         }
-
-        SimpleAdapter adapter = new SimpleAdapter(
-                this,
-                dataList,
-                R.layout.list_item_transport_order,
-                new String[]{"name", "driver", "vehicle", "route", "status"},
-                new int[]{R.id.item_name, R.id.item_driver, R.id.item_vehicle, R.id.item_route, R.id.item_status}
-        );
-
-        listView.setAdapter(adapter);
     }
-
 }
