@@ -1,6 +1,7 @@
 package com.goldencargo.app.service;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -20,13 +21,17 @@ import java.util.Map;
 public class TransportOrderService {
 
     private static final String API_URL = "http://10.0.2.2:8080/api";
-    private static final String TRANSPORT_ORDERS = "/transport-orders/get";
+    private static final String TRANSPORT_ORDERS = "/transport-orders/all";
     private static final String TAG = "TransportOrderService";
+    private static final String PREF_NAME = "AuthPreferences";
+    private static final String JWT_KEY = "jwt_token";
 
     private final RequestQueue queue;
+    private final SharedPreferences sharedPreferences;
 
     public TransportOrderService(Context context) {
         this.queue = Volley.newRequestQueue(context);
+        this.sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
     public void fetchTransportOrders(Response.Listener<JSONArray> onSuccess, Response.ErrorListener onError) {
@@ -38,7 +43,19 @@ public class TransportOrderService {
                 null,
                 onSuccess,
                 onError
-        );
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                String token = sharedPreferences.getString(JWT_KEY, null);
+                if (token != null) {
+                    headers.put("Authorization", "Bearer " + token);
+                }
+
+                return headers;
+            }
+        };
 
         queue.add(jsonArrayRequest);
     }

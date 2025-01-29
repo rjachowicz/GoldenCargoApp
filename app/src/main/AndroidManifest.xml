@@ -15,6 +15,9 @@
 
         <activity android:name=".MainActivity" />
         <activity android:name=".TransportOrdersActivity" />
+        <activity android:name=".ManageVehiclesActivity" />
+        <activity android:name=".IncidentsReportsActivity" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="true">
