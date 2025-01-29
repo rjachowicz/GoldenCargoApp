@@ -8,9 +8,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,10 +59,11 @@ public class TransportOrderService {
         queue.add(jsonArrayRequest);
     }
 
-    public void fetchTransportOrdersToDo(Response.Listener<JSONArray> onSuccess, Response.ErrorListener onError) {
+    public void fetchTransportOrdersToDo(Response.Listener<JSONObject> onSuccess,
+                                         Response.ErrorListener onError) {
         Log.d(TAG, "Sending request to API: " + API_URL + TRANSPORT_ORDERS_TODO);
 
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET,
                 API_URL + TRANSPORT_ORDERS_TODO,
                 null,
@@ -79,6 +82,7 @@ public class TransportOrderService {
             }
         };
 
-        queue.add(jsonArrayRequest);
+        queue.add(jsonObjectRequest);
     }
+
 }

@@ -17,6 +17,7 @@
         <activity android:name=".TransportOrdersActivity" />
         <activity android:name=".ManageVehiclesActivity" />
         <activity android:name=".IncidentsReportsActivity" />
+        <activity android:name=".TransportDetailsActivity" />
 
         <activity
             android:name=".LoginActivity"
