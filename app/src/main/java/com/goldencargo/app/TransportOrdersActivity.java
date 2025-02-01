@@ -20,7 +20,6 @@ import java.util.List;
 public class TransportOrdersActivity extends AppCompatActivity {
 
     private static final String TAG = "TransportOrdersActivity";
-    private RecyclerView recyclerCompleted, recyclerNew, recyclerPending;
     private TransportOrderAdapter adapterCompleted, adapterNew, adapterPending;
     private TransportOrderService transportOrderService;
 
@@ -31,22 +30,15 @@ public class TransportOrdersActivity extends AppCompatActivity {
 
         transportOrderService = new TransportOrderService(this);
 
-        recyclerCompleted = findViewById(R.id.recycler_completed);
-        recyclerNew = findViewById(R.id.recycler_new);
-        recyclerPending = findViewById(R.id.recycler_pending);
+        RecyclerView recyclerCompleted = findViewById(R.id.recycler_completed);
 
         recyclerCompleted.setLayoutManager(new LinearLayoutManager(this));
-        recyclerNew.setLayoutManager(new LinearLayoutManager(this));
-        recyclerPending.setLayoutManager(new LinearLayoutManager(this));
 
         adapterCompleted = new TransportOrderAdapter(new ArrayList<>());
         adapterNew = new TransportOrderAdapter(new ArrayList<>());
         adapterPending = new TransportOrderAdapter(new ArrayList<>());
 
         recyclerCompleted.setAdapter(adapterCompleted);
-        recyclerNew.setAdapter(adapterNew);
-        recyclerPending.setAdapter(adapterPending);
-
         fetchTransportOrders();
     }
 

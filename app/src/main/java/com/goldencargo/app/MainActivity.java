@@ -14,77 +14,197 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import com.android.volley.VolleyError;
 import com.goldencargo.app.service.TransportOrderService;
 
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private CardView cardTransport;
-    private TextView tvShortInfo;
-    private Button btnDetails;
-    private Button btnStart;
+    private CardView cardTransportTodo;
+    private TextView tvTodoInfo;
+    private Button btnTodoDetails;
+    private Button btnTodoStart;
+
+    private CardView cardTransportPending;
+    private TextView tvPendingInfo;
+    private Button btnPendingDetails;
+    private Button btnPendingFinish;
+
+    private String noData = "NaN Data";
+
+    private TransportOrderService transportOrderService;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        cardTransport = findViewById(R.id.cardTransport);
-        tvShortInfo = findViewById(R.id.tvShortInfo);
-        btnDetails = findViewById(R.id.btnDetails);
-        btnStart = findViewById(R.id.btnStart);
-        cardTransport.setVisibility(View.GONE);
 
-        TransportOrderService transportOrderService = new TransportOrderService(this);
-        Log.d(TAG, "Fetching transport order data...");
-        transportOrderService.fetchTransportOrdersToDo(
-                response -> {
-                    Log.d(TAG, "Response received: " + response.toString());
-                    parseAndDisplayData(response);
-                },
-                (VolleyError error) -> {
-                    Log.e(TAG, "Error fetching data: " + error.getMessage());
-                    Toast.makeText(this, "Error fetching data", Toast.LENGTH_SHORT).show();
-                }
-        );
+        cardTransportTodo = findViewById(R.id.cardTransportTodo);
+        tvTodoInfo = findViewById(R.id.tvTodoInfo);
+        btnTodoDetails = findViewById(R.id.btnTodoDetails);
+        btnTodoStart = findViewById(R.id.btnTodoStart);
+
+        cardTransportPending = findViewById(R.id.cardTransportPending);
+        tvPendingInfo = findViewById(R.id.tvPendingInfo);
+        btnPendingDetails = findViewById(R.id.btnPendingDetails);
+        btnPendingFinish = findViewById(R.id.btnPendingFinish);
+        Button btnRefresh = findViewById(R.id.btnRefresh);
+
+        transportOrderService = new TransportOrderService(this);
+
+        hideCards();
+        fetchData();
+
+        btnRefresh.setOnClickListener(v -> {
+            hideCards();
+            fetchData();
+        });
 
         ImageButton menuButton = findViewById(R.id.menuButton);
         menuButton.setOnClickListener(this::showDropdownMenu);
     }
 
-    private void parseAndDisplayData(JSONObject response) {
+    private void hideCards() {
+        cardTransportTodo.setVisibility(View.GONE);
+        cardTransportPending.setVisibility(View.GONE);
+    }
+
+    private void fetchData() {
+        fetchTodoOrders();
+        fetchPendingOrders();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void fetchTodoOrders() {
+        Log.d(TAG, "Fetching todo transport order data...");
+        transportOrderService.fetchTransportOrdersToDo(
+                response -> {
+                    Log.d(TAG, "Todo Response: " + response.toString());
+                    parseAndDisplayTodo(response);
+                },
+                error -> Log.e(TAG, "Error fetching todo orders: " + error.getMessage())
+        );
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void fetchPendingOrders() {
+        Log.d(TAG, "Fetching pending transport order data...");
+        transportOrderService.fetchTransportOrdersPending(
+                response -> {
+                    Log.d(TAG, "Pending Response: " + response.toString());
+                    parseAndDisplayPending(response);
+                },
+                error -> Log.e(TAG, "Error fetching pending orders: " + error.getMessage())
+        );
+    }
+
+    private void parseAndDisplayTodo(JSONObject response) {
         try {
-            int transportId = response.optInt("transportId", -1);
+            int transportOrderId = response.optInt("transportOrderId", -1);
             String driverName = response.optString("driverName", "No driver");
             String createdAt = response.optString("transportCreatedAt", "N/A");
 
-            String shortText = "Transport ID: " + transportId + "\n" +
+            String shortText = "Transport Order ID: " + transportOrderId + "\n" +
                     "Driver: " + driverName + "\n" +
                     "Created at: " + createdAt;
-            tvShortInfo.setText(shortText);
+            tvTodoInfo.setText(shortText);
+            cardTransportTodo.setVisibility(View.VISIBLE);
 
-            cardTransport.setVisibility(View.VISIBLE);
-
-            btnDetails.setOnClickListener(v -> {
+            btnTodoDetails.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity.this, TransportDetailsActivity.class);
                 intent.putExtra("transportData", response.toString());
                 startActivity(intent);
             });
 
-            btnStart.setOnClickListener(v -> {
-                Toast.makeText(MainActivity.this, "Start clicked. (Status -> PENDING)", Toast.LENGTH_SHORT).show();
-                // wywołanie transportOrderService.updateStatus(...)
+            btnTodoStart.setOnClickListener(v -> {
+                if (transportOrderId == -1) {
+                    Toast.makeText(MainActivity.this,
+                            "No transport order available",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",
+                        Locale.getDefault()).format(new Date());
+                transportOrderService.startTransport((long) transportOrderId, date,
+                        resp -> {
+                            Toast.makeText(MainActivity.this,
+                                    "Transport started successfully",
+                                    Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "Transport started: " + resp.toString());
+                        },
+                        err -> {
+                            Toast.makeText(MainActivity.this,
+                                    "Failed to start transport",
+                                    Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "Error starting transport: " + err.getMessage());
+                        });
             });
 
         } catch (Exception e) {
-            Log.e(TAG, "Error parsing data: " + e.getMessage());
-            Toast.makeText(this, "Error parsing data", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error parsing todo data: " + e.getMessage());
+            Toast.makeText(MainActivity.this,
+                    "Error parsing todo data",
+                    Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void parseAndDisplayPending(JSONObject response) {
+        try {
+            int transportOrderId = response.optInt("transportOrderId", -1);
+            String driverName = response.optString("driverName", "No driver");
+            String createdAt = response.optString("transportCreatedAt", "N/A");
+
+            String shortText = "Transport ID: " + transportOrderId + "\n" +
+                    "Driver: " + driverName + "\n" +
+                    "Created at: " + createdAt;
+            tvPendingInfo.setText(shortText);
+            cardTransportPending.setVisibility(View.VISIBLE);
+
+            btnPendingDetails.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, TransportDetailsActivity.class);
+                intent.putExtra("transportData", response.toString());
+                startActivity(intent);
+            });
+
+            btnPendingFinish.setOnClickListener(v -> {
+                if (transportOrderId == -1) {
+                    Toast.makeText(MainActivity.this,
+                            "No transport order available",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",
+                        Locale.getDefault()).format(new Date());
+                transportOrderService.endTransport((long) transportOrderId, date,
+                        resp -> {
+                            Toast.makeText(MainActivity.this,
+                                    "Transport ended successfully",
+                                    Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "Transport ended: " + resp.toString());
+                            hideCards();
+                            fetchData();
+                        },
+                        err -> {
+                            Toast.makeText(MainActivity.this,
+                                    "Failed to end transport",
+                                    Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "Error ending transport: " + err.getMessage());
+                        });
+            });
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error parsing pending data: " + e.getMessage());
+            Toast.makeText(MainActivity.this, "Error parsing pending data", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void showDropdownMenu(View anchor) {
         PopupMenu popupMenu = new PopupMenu(this, anchor);
         popupMenu.getMenuInflater().inflate(R.menu.menu_main, popupMenu.getMenu());
@@ -109,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
-
         popupMenu.show();
     }
 }
+
