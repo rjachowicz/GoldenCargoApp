@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "10623344762",
+    "project_id": "goldencargoapp",
+    "storage_bucket": "goldencargoapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:10623344762:android:5a854ec2683f48bdd61bc3",
+        "android_client_info": {
+          "package_name": "com.goldencargo.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBU5oaU-GtXWEO4ZoBj6BcYfSw9PURQOgM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

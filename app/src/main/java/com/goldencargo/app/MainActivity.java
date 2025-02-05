@@ -2,6 +2,8 @@ package com.goldencargo.app;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,10 +13,16 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.goldencargo.app.service.TransportOrderService;
+import com.goldencargo.app.service.UserService;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
 
@@ -36,14 +44,17 @@ public class MainActivity extends AppCompatActivity {
     private Button btnPendingDetails;
     private Button btnPendingFinish;
 
-    private String noData = "NaN Data";
-
     private TransportOrderService transportOrderService;
+    private UserService userService;
 
-    @SuppressLint("SetTextI18n")
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 100;
+
+    @SuppressLint({"SetTextI18n", "ObsoleteSdkInt"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseApp.initializeApp(this);
+
         setContentView(R.layout.activity_main);
 
         cardTransportTodo = findViewById(R.id.cardTransportTodo);
@@ -58,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
         Button btnRefresh = findViewById(R.id.btnRefresh);
 
         transportOrderService = new TransportOrderService(this);
+        userService = new UserService(this);
+
+        fetchAndSendFcmToken();
 
         hideCards();
         fetchData();
@@ -69,6 +83,32 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton menuButton = findViewById(R.id.menuButton);
         menuButton.setOnClickListener(this::showDropdownMenu);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this,
+                    android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
+                        REQUEST_NOTIFICATION_PERMISSION)
+                ;
+            }
+        }
+    }
+
+    private void fetchAndSendFcmToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+                    String newFcmToken = task.getResult();
+                    Log.d(TAG, "New FCM token: " + newFcmToken);
+
+                    userService.sendFcmTokenToBackend(newFcmToken,
+                            response -> Log.d(TAG, "Token saved on backend: " + response.toString()),
+                            error -> Log.e(TAG, "Failed to save token: " + error.getMessage()));
+                });
     }
 
     private void hideCards() {
@@ -231,5 +271,17 @@ public class MainActivity extends AppCompatActivity {
         });
         popupMenu.show();
     }
-}
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("Notifications", "Notification permission access");
+            } else {
+                Log.d("Notifications", "Notification permission not access");
+            }
+        }
+    }
+}

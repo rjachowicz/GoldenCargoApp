@@ -29,11 +29,15 @@ android {
 }
 
 dependencies {
-
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.messaging
     implementation libs.appcompat
     implementation libs.material
     implementation libs.volley
+    implementation libs.firebase.analytics
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 }
+
+apply plugin: 'com.google.gms.google-services'
