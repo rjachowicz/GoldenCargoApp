@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_create_report"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#f0f0f0"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etReportType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Report Type"
+        android:layout_marginBottom="8dp"
+        android:inputType="textCapWords"
+        />
+
+    <EditText
+        android:id="@+id/etReportContent"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:gravity="top"
+        android:hint="Report Content"
+        android:layout_marginBottom="16dp"
+        android:inputType="textMultiLine"
+        />
+
+    <Button
+        android:id="@+id/btnCreate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create" />
+
+</LinearLayout>

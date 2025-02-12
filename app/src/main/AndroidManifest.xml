@@ -18,6 +18,10 @@
         <activity android:name=".ManageVehiclesActivity" />
         <activity android:name=".IncidentsReportsActivity" />
         <activity android:name=".TransportDetailsActivity" />
+        <activity android:name=".ReportActivity" />
+        <activity android:name=".CreateReportActivity"/>
+        <activity android:name=".IncidentActivity" />
+        <activity android:name=".CreateIncidentActivity" />
 
         <activity
             android:name=".LoginActivity"

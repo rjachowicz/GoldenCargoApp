@@ -28,16 +28,6 @@
             android:textColor="@color/black"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/btnRefresh"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:backgroundTint="@color/black"
-            android:text="Refresh"
-            android:textColor="@color/white" />
-
         <ImageButton
             android:id="@+id/menuButton"
             android:layout_width="48dp"

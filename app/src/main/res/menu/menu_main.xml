@@ -6,24 +6,15 @@
         android:title="Transport"
         tools:ignore="HardcodedText" />
     <item
-        android:id="@+id/menu_logistics"
-        android:icon="@drawable/ic_logistics"
-        android:title="Incidents"
-        tools:ignore="HardcodedText" />
-    <item
-        android:id="@+id/menu_routes"
-        android:icon="@drawable/ic_routes"
-        android:title="Damages"
-        tools:ignore="HardcodedText" />
-    <item
-        android:id="@+id/menu_locations"
+        android:id="@+id/menu_reports"
         android:icon="@drawable/ic_locations"
         android:title="Reports"
         tools:ignore="HardcodedText" />
+
     <item
-        android:id="@+id/menu_transports"
-        android:icon="@drawable/ic_transports"
-        android:title="Breakdowns"
+        android:id="@+id/menu_incidents"
+        android:icon="@drawable/ic_logistics"
+        android:title="Incidents"
         tools:ignore="HardcodedText" />
 
 </menu>

@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'com.goldencargo.app'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.goldencargo.app"
@@ -35,6 +35,7 @@ dependencies {
     implementation libs.material
     implementation libs.volley
     implementation libs.firebase.analytics
+    implementation libs.recyclerview
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         tvPendingInfo = findViewById(R.id.tvPendingInfo);
         btnPendingDetails = findViewById(R.id.btnPendingDetails);
         btnPendingFinish = findViewById(R.id.btnPendingFinish);
-        Button btnRefresh = findViewById(R.id.btnRefresh);
 
         transportOrderService = new TransportOrderService(this);
         userService = new UserService(this);
@@ -75,11 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         hideCards();
         fetchData();
-
-        btnRefresh.setOnClickListener(v -> {
-            hideCards();
-            fetchData();
-        });
 
         ImageButton menuButton = findViewById(R.id.menuButton);
         menuButton.setOnClickListener(this::showDropdownMenu);
@@ -178,6 +172,8 @@ public class MainActivity extends AppCompatActivity {
                                     "Transport started successfully",
                                     Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "Transport started: " + resp.toString());
+                            hideCards();
+                            fetchData();
                         },
                         err -> {
                             Toast.makeText(MainActivity.this,
@@ -250,17 +246,13 @@ public class MainActivity extends AppCompatActivity {
         popupMenu.getMenuInflater().inflate(R.menu.menu_main, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.menu_logistics) {
-                Toast.makeText(this, "Logistics clicked", Toast.LENGTH_SHORT).show();
+            if (id == R.id.menu_reports) {
+                Intent intent = new Intent(MainActivity.this, ReportActivity.class);
+                startActivity(intent);
                 return true;
-            } else if (id == R.id.menu_routes) {
-                Toast.makeText(this, "Routes clicked", Toast.LENGTH_SHORT).show();
-                return true;
-            } else if (id == R.id.menu_locations) {
-                Toast.makeText(this, "Locations clicked", Toast.LENGTH_SHORT).show();
-                return true;
-            } else if (id == R.id.menu_transports) {
-                Toast.makeText(this, "Transports clicked", Toast.LENGTH_SHORT).show();
+            } else if (id == R.id.menu_incidents) {
+                Intent intent = new Intent(MainActivity.this, IncidentActivity.class);
+                startActivity(intent);
                 return true;
             } else if (id == R.id.menu_transport_orders) {
                 Intent intent = new Intent(MainActivity.this, TransportOrdersActivity.class);

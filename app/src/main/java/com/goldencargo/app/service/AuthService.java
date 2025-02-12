@@ -44,7 +44,6 @@ public class AuthService {
 
         sendPostRequest(loginData, response -> {
             try {
-                // Zakładamy, że token znajduje się w odpowiedzi pod kluczem "token"
                 String token = response.getString("token");
                 saveToken(token);
                 successListener.onResponse(response);
