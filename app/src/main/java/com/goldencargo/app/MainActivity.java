@@ -78,6 +78,12 @@ public class MainActivity extends AppCompatActivity {
         ImageButton menuButton = findViewById(R.id.menuButton);
         menuButton.setOnClickListener(this::showDropdownMenu);
 
+        Button btnRefresh = findViewById(R.id.btnRefresh);
+        btnRefresh.setOnClickListener(v -> {
+            hideCards();
+            fetchData();
+        });
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this,
                     android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
